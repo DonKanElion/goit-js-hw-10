@@ -3,7 +3,7 @@ import debounce from 'lodash.debounce';
 import Notiflix from 'notiflix';
 
 
-const DEBOUNCE_DELAY = 300;
+import { fetchCountries } from './js/fetchCountries';
 
 const refs = {
     searchBox: document.querySelector("input#search-box"),
@@ -11,70 +11,42 @@ const refs = {
     countryInfo: document.querySelector('.country-info'),
 };
 
-refs.searchBox.addEventListener('input', debounce(catchInput, DEBOUNCE_DELAY));
+const DEBOUNCE_DELAY = 300;
 
-function catchInput(evt){
-    evt.preventDefault();
+refs.searchBox.addEventListener('input', debounce(onSearch, DEBOUNCE_DELAY));
 
-    let searchCountry = refs.searchBox.value.trim();
-    console.log(searchCountry);
+function onSearch(evt){
 
-    fetchCountries(searchCountry);
+    const searchCountry = refs.searchBox.value.trim();
 
-    refs.countryInfo.innerHTML = '';
-    refs.countryList.innerHTML = '';
-  
-    if (!searchCountry) {
-      return;
-    }
+    if(!searchCountry){
+      refs.countryInfo.innerHTML = '';
+      refs.countryList.innerHTML = '';
+    };
 
-};
-
-function fetchCountries(country) {
-    console.log(`Hello fetchCountries: ${country}`);
-
-    fetch(`https://restcountries.com/v3.1/name/${country}?fields=name,capital,population,flags,languages`)
-
-    .then(response => {
-        if(!response.ok || response.status === 404){
-            throw new Error(Notiflix.Notify.failure('Oops, there is no country with that name'));
-        }
-        return response.json();
-    })
-    .then(data => {
-
-        if(data.length >= 10){
-            throw new Error(Notiflix.Notify.info('Too many matches found. Please enter a more specific name.'));
+    fetchCountries(searchCountry)
+        .then(data => {
+        if(data.length > 10){
+            return Notiflix.Notify.info(
+              'Too many matches found. Please enter a more specific name.');
         };
         if(data.length >2 && data.length <= 9){
-            return renderCountryList(data)
+          refs.countryInfo.innerHTML = '';
+          return renderCountryList(data)
         }
-        renderCountryInfo(data)
-        console.log('Then 2: data ', data[0])
-    
-    })
-    // .catch(error => {
-    //     // console.log('This is ERROR !!!! ', error)
-    //     Notiflix.Notify.failure('Oops, there is no country with that name')
-    // });
-
-
-    // single COUNTER (test)
-
-    // fetch(`https://restcountries.com/v3.1/name/${country}`)
-    // .then(response => {
-    //     console.log('Then 1: response ', response)
-    // })
-    // .then(data => {
-    //     console.log('Then 2: data ', data)
-    // })
-    // .catch(error => {
-    //     console,log('This is ERROR !!!! ', error)
-    // });
+        else  
+          refs.countryList.innerHTML = '';
+          renderCountryInfo(data)
+          console.log('Then 2: data ', data[0])
+        
+        })
+        .catch(error => {
+            Notiflix.Notify.failure('Oops, there is no country with that name', error)
+        });
 
 };
 
-// EXAMPLE RENDER!!!! from conspect
+// ========= RENDER =======
 
 function renderCountryList(countries) {
     const markup = countries
