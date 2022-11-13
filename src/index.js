@@ -22,6 +22,7 @@ function onSearch(evt){
     if(!searchCountry){
       refs.countryInfo.innerHTML = '';
       refs.countryList.innerHTML = '';
+      return
     };
 
     fetchCountries(searchCountry)

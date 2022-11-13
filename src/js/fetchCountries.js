@@ -2,8 +2,6 @@
 const URL_BASE = 'https://restcountries.com/v3.1';
 
 export function fetchCountries(country) {
-    console.log(`Hello fetchCountries: ${country}`);
-
    return fetch(`${URL_BASE}/name/${country}?fields=name,capital,population,flags,languages`)
     .then(response => {
         if(!response.ok || response.status === 404){
