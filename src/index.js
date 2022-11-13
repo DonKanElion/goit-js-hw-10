@@ -37,7 +37,6 @@ function onSearch(evt){
         else  
           refs.countryList.innerHTML = '';
           renderCountryInfo(data)
-          console.log('Then 2: data ', data[0])
         
         })
         .catch(error => {
